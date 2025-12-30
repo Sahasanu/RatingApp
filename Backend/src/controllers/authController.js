@@ -108,4 +108,17 @@ const updatePassword = async (req, res) => {
   }
 };
 
-export { signup, login, updatePassword };
+// @desc    Get current user
+// @route   GET /api/auth/me
+// @access  Private
+const getMe = async (req, res) => {
+  const user = {
+    id: req.user.id,
+    name: req.user.name,
+    email: req.user.email,
+    role: req.user.role
+  };
+  res.json(user);
+};
+
+export { signup, login, updatePassword, getMe };
