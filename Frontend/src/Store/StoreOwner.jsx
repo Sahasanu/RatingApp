@@ -6,14 +6,14 @@ import RatingTable from './RatingTable';
 import TopCard from './TopCards'
 import NoStore from './NoStore'
 import Welcome from './Welcome'
-import Loading from '../components/bubbleLoader'
+import BubbleLoader from '../components/Laoding';
 
 const OwnerDashboard = () => {
  
     const { user, logout } = useAuth(); 
     const { store, ratings, loading } = useOwner();
 
-    if (loading) return <Loading/>
+    if (loading) return <BubbleLoader/>
     if (!store && !loading) return <NoStore logout={logout} />
     return (
         <div className="bg-gray-200/70 min-h-screen text-slate-900 font-sans">

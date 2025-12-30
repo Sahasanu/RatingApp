@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext'
+import { useStore } from '../context/StoreContext'
 import Welcome from './Welcome';
 import Search from './Search';
 import StoreTable from './StoreTable';
 import Pagination from './Pagination';
-
+import BubbleLoader from '../components/Laoding';
 const User = () => {
     const { user } = useAuth();
+    const {loading}=useStore()
    
-
-    // Lifted state from StoreTable
     const [pendingRatings, setPendingRatings] = useState({});
-
     const pendingCount = Object.keys(pendingRatings).length;
+
+    if (loading) return <BubbleLoader/>
 
     return (
         <div className="bg-gray-200/70 min-h-screen flex flex-col font-sans text-slate-800">
