@@ -28,7 +28,16 @@ const signup = async (req, res) => {
       email,
       password: hashedPassword,
       address,
-      role: "USER", 
+      role: "USER",
+    });
+
+    const token = generateToken(user.id, user.role);
+
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV !== 'development',
+      sameSite: 'strict',
+      maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
     });
 
     res.status(201).json({
@@ -36,7 +45,6 @@ const signup = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
-      token: generateToken(user.id, user.role),
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -53,12 +61,21 @@ const login = async (req, res) => {
     const user = await User.findOne({ where: { email } });
 
     if (user && (await bcrypt.compare(password, user.password))) {
+
+      const token = generateToken(user.id, user.role);
+
+      res.cookie('jwt', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== 'development',
+        sameSite: 'strict',
+        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+      });
+
       res.json({
         id: user.id,
         name: user.name,
         email: user.email,
         role: user.role,
-        token: generateToken(user.id, user.role),
       });
     } else {
       res.status(401).json({ message: "Invalid email or password" });

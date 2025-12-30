@@ -8,10 +8,9 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
         const storedUser = localStorage.getItem('user');
 
-        if (token && storedUser) {
+        if (storedUser) {
             setUser(JSON.parse(storedUser));
         }
         setLoading(false);
@@ -20,7 +19,6 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, password) => {
         try {
             const { data } = await api.post('/auth/login', { email, password });
-            localStorage.setItem('token', data.token);
 
             const userData = {
                 id: data.id,
@@ -41,7 +39,7 @@ export const AuthProvider = ({ children }) => {
     const signup = async (userData) => {
         try {
             const { data } = await api.post('/auth/signup', userData);
-            localStorage.setItem('token', data.token);
+
             const userPayload = {
                 id: data.id,
                 name: data.name,
@@ -66,10 +64,15 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const logout = () => {
-        localStorage.removeItem('token');
+    const logout = async () => {
+        // Optional: Call API to clear cookie
+        // await api.post('/auth/logout'); 
+        // For now just clear local state which is effectively logout for the UI
+        // And you might want to call an endpoint to clear the cookie on the server side
         localStorage.removeItem('user');
         setUser(null);
+        // Reload to ensure all states are cleared or redirected
+        window.location.href = '/';
     };
 
     return (
