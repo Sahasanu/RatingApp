@@ -8,12 +8,31 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
+        const checkUserLoggedIn = async () => {
+            const storedUser = localStorage.getItem('user');
 
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
-        }
-        setLoading(false);
+            if (storedUser) {
+                // Determine if we should validate the token too? 
+                // For now, trust localStorage for instant load, but verify in background if needed
+                setUser(JSON.parse(storedUser));
+                setLoading(false);
+            } else {
+                // No local user, check if we have a valid cookie session
+                try {
+                    const { data } = await api.get('/auth/me');
+                    setUser(data);
+                    localStorage.setItem('user', JSON.stringify(data));
+                } catch (error) {
+                    // Cookie invalid or missing
+                    setUser(null);
+                    // localStorage.removeItem('user'); // Already empty
+                } finally {
+                    setLoading(false);
+                }
+            }
+        };
+
+        checkUserLoggedIn();
     }, []);
 
     const login = async (email, password) => {
